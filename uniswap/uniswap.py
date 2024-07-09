@@ -1499,7 +1499,7 @@ class Uniswap:
         ).build_transaction({
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
-            'gas': 300000,  # Estimated gas limit for decreasing liquidity
+            'gas': 500000,  # Estimated gas limit for decreasing liquidity
             'gasPrice': self.w3.eth.gas_price
         })
 
@@ -1514,7 +1514,7 @@ class Uniswap:
         ).build_transaction({
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
-            'gas': 200000,  # Estimated gas limit for collecting fees
+            'gas': 400000,  # Estimated gas limit for collecting fees
             'gasPrice': self.w3.eth.gas_price
         })
 
@@ -1527,7 +1527,7 @@ class Uniswap:
         burn_tx = self.nonFungiblePositionManager.functions.burn(tokenId).build_transaction({
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
-            'gas': 150000,  # Estimated gas limit for burning token
+            'gas': 350000,  # Estimated gas limit for burning token
             'gasPrice': self.w3.eth.gas_price
         })
         
