@@ -1984,7 +1984,7 @@ class Uniswap:
 
     @supports([3])
     def get_pool_instance(
-        self, token_0: AddressLike, token_1: AddressLike, fee: int = 3_000
+        self, token_0: AddressLike, token_1: AddressLike, fee: int = 500
     ) -> Contract:
         """
         Returns an instance of a pool contract for a given token pair and fee.
@@ -2021,7 +2021,7 @@ class Uniswap:
 
     @supports([3])
     def create_pool_instance(
-        self, token_0: AddressLike, token_1: AddressLike, fee: int = 3_000
+        self, token_0: AddressLike, token_1: AddressLike, fee: int = 500
     ) -> Contract:
         """
         Creates and returns UniswapV3 Pool instance. Requires that fee is valid and no similar pool already exists.
