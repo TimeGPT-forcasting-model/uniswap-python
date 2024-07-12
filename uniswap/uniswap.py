@@ -1260,7 +1260,7 @@ class Uniswap:
     #             'from': self.address_string,
     #             'nonce':  self.w3.eth.get_transaction_count(self.address_string, 'pending'),
     #             'gas': 3000000,  # Estimated gas limit
-    #             'gasPrice': self.w3.eth.gas_price
+    #             'gasPrice': self.w3.eth.gas_price *1.1
     #         })
     #         signed_mint_tx = self.w3.eth.account.sign_transaction(mint_tx, private_key=self.private_key)
     #         tx_hash = self.w3.eth.send_raw_transaction(signed_mint_tx.rawTransaction)
@@ -1300,7 +1300,7 @@ class Uniswap:
     #             'from': self.address_string,
     #             'nonce':  self.w3.eth.get_transaction_count(self.address_string, 'pending'),
     #             'gas': 3000000,  # Estimated gas limit
-    #             'gasPrice': self.w3.eth.gas_price
+    #             'gasPrice': self.w3.eth.gas_price *1.1
     #         })
     #         signed_mint_tx = self.w3.eth.account.sign_transaction(mint_tx, private_key=self.private_key)
     #         tx_hash = self.w3.eth.send_raw_transaction(signed_mint_tx.rawTransaction)
@@ -1415,7 +1415,7 @@ class Uniswap:
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
             'gas': 3000000,  # Estimated gas limit
-            'gasPrice': self.w3.eth.gas_price,
+            'gasPrice': self.w3.eth.gas_price *1.1,
             'value': eth_amount if is_eth_pair else 0  # Send ETH along with the transaction if it's an ETH pair
         })
 
@@ -1500,7 +1500,7 @@ class Uniswap:
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
             'gas': 500000,  # Estimated gas limit for decreasing liquidity
-            'gasPrice': self.w3.eth.gas_price
+            'gasPrice': self.w3.eth.gas_price *1.1
         })
 
         signed_decrease_liquidity_tx = self.w3.eth.account.sign_transaction(
@@ -1515,7 +1515,7 @@ class Uniswap:
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
             'gas': 400000,  # Estimated gas limit for collecting fees
-            'gasPrice': self.w3.eth.gas_price
+            'gasPrice': self.w3.eth.gas_price *1.1
         })
 
         signed_collect_fees_tx = self.w3.eth.account.sign_transaction(
@@ -1528,7 +1528,7 @@ class Uniswap:
             'from': self.address_string,
             'nonce': self.w3.eth.get_transaction_count(self.address_string, 'pending'),
             'gas': 350000,  # Estimated gas limit for burning token
-            'gasPrice': self.w3.eth.gas_price
+            'gasPrice': self.w3.eth.gas_price *1.1
         })
         
         signed_burn_tx = self.w3.eth.account.sign_transaction(burn_tx, private_key=self.private_key)
