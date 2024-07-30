@@ -36,6 +36,16 @@ tokens_arbitrum: Dict[str, ChecksumAddress] = {
     }.items()
 }
 
+tokens_zksync: Dict[str, ChecksumAddress] = {
+    k: Web3.to_checksum_address(v)
+    for k, v in {
+        "ZK" :"0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E",
+        "USDC":"0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "ETH":"0x0000000000000000000000000000000000000000",
+        "WETH":"0x5aea5775959fbc2557cc8789bc1bf90a239d9a91",
+    }.items()
+}
+
 
 def get_tokens(netname: str) -> Dict[str, ChecksumAddress]:
     """
@@ -48,5 +58,7 @@ def get_tokens(netname: str) -> Dict[str, ChecksumAddress]:
         return tokens_rinkeby
     elif netname == "arbitrum":
         return tokens_arbitrum
+    elif netname == "zksync":
+        return tokens_zksync
     else:
         raise Exception(f"Unknown net '{netname}'")

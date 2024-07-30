@@ -59,6 +59,7 @@ from .util import (
     nearest_tick,
     realised_fee_percentage,
 )
+from .tokens import get_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -181,24 +182,42 @@ class Uniswap:
             )
         elif self.version == 3:
             # https://github.com/Uniswap/uniswap-v3-periphery/blob/main/deploys.md
-            factory_contract_address = _str_to_addr(
-                "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+            if self.netname == "zksync":
+                factory_contract_address = _str_to_addr(
+                    "0x8FdA5a7a8dCA67BBcDd10F02Fa0649A937215422"
+                )
+                self.router_address = _str_to_addr(
+                    "0x28731BCC616B5f51dD52CF2e4dF0E78dD1136C06"
+                )
+                quoter_addr = _str_to_addr("0x8Cb537fc92E26d8EBBb760E632c95484b6Ea3e28")
+                self.positionManager_addr = _str_to_addr(
+                    "0x0616e5762c1E7Dc3723c50663dF10a162D690a86"
+                )
+            else:
+                factory_contract_address = _str_to_addr(
+                    "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+                )
+                self.router_address = _str_to_addr(
+                    "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+                )
+                quoter_addr = _str_to_addr("0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6")
+
+                self.positionManager_addr = _str_to_addr(
+                    "0xC36442b4a4522E871399CD717aBDD847Ab11FE88"
+                )
+            if self.netname == "zksync":
+                self.quoter = _load_contract(
+                self.w3, abi_name="uniswap-v3/quoterv2", address=quoter_addr
             )
+            else:
+                self.quoter = _load_contract(
+                    self.w3, abi_name="uniswap-v3/quoter", address=quoter_addr
+                )
             self.factory_contract = _load_contract(
                 self.w3, abi_name="uniswap-v3/factory", address=factory_contract_address
             )
-            quoter_addr = _str_to_addr("0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6")
-            self.router_address = _str_to_addr(
-                "0xE592427A0AEce92De3Edee1F18E0157C05861564"
-            )
-            self.quoter = _load_contract(
-                self.w3, abi_name="uniswap-v3/quoter", address=quoter_addr
-            )
             self.router = _load_contract(
                 self.w3, abi_name="uniswap-v3/router", address=self.router_address
-            )
-            self.positionManager_addr = _str_to_addr(
-                "0xC36442b4a4522E871399CD717aBDD847Ab11FE88"
             )
             self.nonFungiblePositionManager = _load_contract(
                 self.w3,
@@ -208,6 +227,10 @@ class Uniswap:
             if self.netname == "arbitrum":
                 multicall2_addr = _str_to_addr(
                     "0x50075F151ABC5B6B448b1272A0a1cFb5CFA25828"
+                )
+            elif self.netname == "zksync":
+                multicall2_addr = _str_to_addr(
+                    "0x0c68a7C72f074d1c45C16d41fa74eEbC6D16a65C"
                 )
             else:
                 multicall2_addr = _str_to_addr(
@@ -220,7 +243,6 @@ class Uniswap:
             raise Exception(
                 f"Invalid version '{self.version}', only 1, 2 or 3 supported"
             )
-
         if hasattr(self, "factory_contract"):
             logger.info(f"Using factory contract: {self.factory_contract}")
 
@@ -347,9 +369,20 @@ class Uniswap:
 
             # FIXME: How to calculate this properly? See https://docs.uniswap.org/reference/libraries/SqrtPriceMath
             sqrtPriceLimitX96 = 0
-            price = self.quoter.functions.quoteExactInputSingle(
-                token0, token1, fee, qty, sqrtPriceLimitX96
-            ).call()
+            if self.netname=='zksync':
+                params = {
+                    'tokenIn': token0,
+                    'tokenOut': token1,
+                    'fee': fee,
+                    'amountIn': qty,
+                    'sqrtPriceLimitX96': sqrtPriceLimitX96
+                }
+                amountOut, sqrtPriceX96After, initializedTicksCrossed, gasEstimate = self.quoter.functions.quoteExactInputSingle(params).call()
+                price = amountOut
+            else:
+                price = self.quoter.functions.quoteExactInputSingle(
+                    token0, token1, fee, qty, sqrtPriceLimitX96
+                ).call()
         else:
             raise ValueError("function not supported for this version of Uniswap")
         return price
@@ -1947,7 +1980,8 @@ class Uniswap:
             # Contract calls should always return checksummed addresses
             address: ChecksumAddress = self.router.functions.WETH().call()
         elif self.version == 3:
-            address = self.router.functions.WETH9().call()
+            # address = self.router.functions.WETH9().call()
+            address: ChecksumAddress = get_tokens(self.netname)['WETH']
         else:
             raise ValueError  # pragma: no cover
 
@@ -2359,3 +2393,7 @@ class Uniswap:
             token = self.get_token(address)
             tokens.append(token)
         return tokens
+
+
+if __name__ == "__main__":
+    uniswap = UniswapV3()
